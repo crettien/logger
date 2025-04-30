@@ -1,3 +1,6 @@
+//go:build test
+// +build test
+
 package logger_test
 
 import (
@@ -38,9 +41,10 @@ func TestInitWebSocket(t *testing.T) {
 	}
 
 	// Vérifier que la connexion est établie
-	if logger.WsConn == nil {
+	if logger.GetWsConn() == nil {
 		t.Fatal("WebSocket connection is not established")
 	}
+
 }
 
 func TestCreateLogEntry(t *testing.T) {
