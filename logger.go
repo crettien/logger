@@ -9,10 +9,16 @@ import (
 
 // NewLogEntry crée une nouvelle entrée de log avec les détails fournis.
 // Elle valide les entrées et utilise la fonction actuelle comme nom de fonction par défaut.
-func NewLogEntry(level, message, source, service string) (models.LogEntry, error) {
+func NewLogEntry(level, message, source, service, tags string) (models.LogEntry, error) {
 	// Valider les entrées
-	if level == "" || message == "" || source == "" || service == "" {
-		return models.LogEntry{}, fmt.Errorf("level, message, source, and service must not be empty")
+	if message == "" || source == "" || service == "" {
+		return models.LogEntry{}, fmt.Errorf("message, source, and service must not be empty")
+	}
+	if level == "" {
+		level = "info"
+	}
+	if isValid, _ := IsValidJSON(tags); tags != "" && !isValid {
+		return models.LogEntry{}, fmt.Errorf("%s is not a valid JSON tag string", tags)
 	}
 
 	return models.LogEntry{
@@ -22,5 +28,6 @@ func NewLogEntry(level, message, source, service string) (models.LogEntry, error
 		Function:  getCallerFunctionName(),
 		Source:    source,
 		Service:   service,
+		Tags:      tags,
 	}, nil
 }

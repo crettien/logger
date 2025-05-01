@@ -10,4 +10,5 @@ type LogEntry struct {
 	Function  string    `json:"function"`
 	Source    string    `json:"source"`
 	Service   string    `json:"service"`
+	Tags      string    `json:"tags"`
 }
