@@ -3,12 +3,14 @@ package logger
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/crettien/logger/models"
 	"github.com/gorilla/websocket"
 )
 
 var wsConn *websocket.Conn
+var sendMutex sync.Mutex
 
 // InitializeWebSocketConnection initialise la connexion WebSocket pour l'envoi des logs
 func InitializeWebSocketConnection(proxyURL string) error {
@@ -23,12 +25,25 @@ func InitializeWebSocketConnection(proxyURL string) error {
 	return nil
 }
 
-// SendLogOverWebSocket envoie un log via WebSocket
+// SendLogOverWebSocket envoie un log via WebSocket de manière synchrone
 func SendLogOverWebSocket(logEntry models.LogEntry) error {
+	sendMutex.Lock()
+	defer sendMutex.Unlock()
+
 	if wsConn == nil {
 		return fmt.Errorf("WebSocket connection is not established")
 	}
 	return wsConn.WriteJSON(logEntry)
+}
+
+// SendLogOverWebSocketAsync envoie un log via WebSocket de manière asynchrone
+func SendLogOverWebSocketAsync(logEntry models.LogEntry) {
+	go func() {
+		err := SendLogOverWebSocket(logEntry)
+		if err != nil {
+			fmt.Printf("Failed to send log: %v\n", err) // TODO remonter cette erreur dans Datadog
+		}
+	}()
 }
 
 // CloseWebSocketConnection ferme la connexion WebSocket si elle est ouverte
