@@ -2,6 +2,7 @@ package logger
 
 import (
 	"encoding/json"
+	"regexp"
 	"runtime"
 )
 
@@ -26,4 +27,12 @@ func IsValidJSON(str string) (bool, map[string]interface{}) {
 		return false, nil
 	}
 	return true, jsonData
+}
+
+// IsValidKeyValuePairString checks if a string matches the format "key1:value1,key2:value2"
+func IsValidKeyValuePairString(str string) bool {
+	// Regex to match the format "key:value,key:value"
+	pattern := `^([a-zA-Z]+:[a-zA-Z0-9.]+)(,[a-zA-Z]+:[a-zA-Z0-9.]+)*$`
+	matched, _ := regexp.MatchString(pattern, str)
+	return matched
 }

@@ -17,7 +17,7 @@ func NewLogEntry(level, message, source, service, tags string) (models.LogEntry,
 	if level == "" {
 		level = "info"
 	}
-	if isValid, _ := IsValidJSON(tags); tags != "" && !isValid {
+	if isValid := IsValidKeyValuePairString(tags); tags != "" && !isValid {
 		return models.LogEntry{}, fmt.Errorf("%s is not a valid JSON tag string", tags)
 	}
 
